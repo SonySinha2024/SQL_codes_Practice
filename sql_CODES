@@ -1,0 +1,12 @@
+SELECT DISTINCT(CITY) FROM STATION WHERE CITY not regexp  '[AEIOUaeiou]$';
+
+select sum(c.population) from city c inner join country co on c.countrycode =co.code where co.continent='Asia';
+
+select case when grades.grade<8 THEN NULL
+else students.name 
+end as students_name, grades.grade, students.marks
+from students inner join grades on 
+students.marks between grades.min_mark and grades.max_mark
+order by grades.grade desc, students.name ;
+
+
