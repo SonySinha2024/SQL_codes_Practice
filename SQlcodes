@@ -1,0 +1,9 @@
+select months*salary, count(*)  from employee
+group by months*salary
+order by months*salary 
+DESC LIMIT 1;
+
+
+select name from students where marks>75  order by substr(name,-3), id;
+select round(avg(population),0) from city;
+
