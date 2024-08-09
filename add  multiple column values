@@ -1,0 +1,49 @@
+mysql> UPDATE item
+    -> SET
+    ->     personid = CASE
+    ->         WHEN name = 'lays' THEN 11
+    ->         WHEN name = 'chips' THEN 12
+    ->         ELSE NULL
+    ->     END,
+    ->     expenses = CASE
+    ->         WHEN name = 'lays' THEN 1000
+    ->         WHEN name = 'chips' THEN 800
+    ->         ELSE NULL
+    ->     END;
+Query OK, 2 rows affected (0.01 sec)
+
+
+  select * from item i inner join person p on i.personid=p.personid;
+
+
+mysql> update item set salary=case
+    -> when personid=11 then 5000
+    ->  when personid=12 then 4500
+    ->  when personid=13 then 5500
+    ->  when personid=15 then 6000
+    ->  when personid=17 then 4000
+    ->  when personid=21 then 5800
+    ->  when personid=22 then 3500
+    ->  when personid=23 then 3000
+    -> end,
+    -> personname=case
+    ->  when personid=11 then "john"
+    ->  when personid=12 then "sia"
+    ->  when personid=13 then "kumar"
+    ->  when personid=15 then "marry"
+    ->  when personid=17 then "anu"
+    ->  when personid=21 then "joe"
+    ->  when personid=22 then "rhea"
+    ->  when personid=23 then "charu"
+    -> end;
+Query OK, 8 rows affected (0.11 sec)
+Rows matched: 8  Changed: 8  Warnings: 0
+
+
+  alter table item add column personid int, add column expenses double(10,2);
+Query OK, 0 rows affected, 1 warning (0.07 sec)
+
+   insert into item values("chips",26,60,13,1100);
+Query OK, 1 row affected (0.01 sec)
+
+  
