@@ -89,6 +89,21 @@ END;
 DELIMITER ;
 
 
+DELIMITER //
+mysql> CREATE TRIGGER deleteproducts BEFORE DELETE ON product
+    -> FOR EACH ROW
+    -> BEGIN
+    ->     INSERT INTO product_tr (productid, old_pname, new_pname, old_price, new_price, chdate, username)
+    ->     VALUES (OLD.productid, OLD.pname, NULL, OLD.price, NULL, CURRENT_TIMESTAMP, CURRENT_USER);
+    -> END;
+    -> //
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> delete from product_tr where productid=32 //
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select * from product_tr//
+Empty set (0.00 sec)
 
 
 
