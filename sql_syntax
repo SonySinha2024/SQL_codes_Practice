@@ -1,0 +1,68 @@
+List the empno, name, and department number of the emp works under manager with id 7698
+SELECT empno, name, deptno FROM emp WHERE mgrid = 7698;
+
+
+Display the emp details who do not have manager.
+SELECT * FROM emp WHERE mgr _id= IS NULL;
+
+select * from emp where ename REGEXP ‘^A.*S$| ^..?N.*[NS]$‘
+
+exp =floor(datediff(curdate(),hiredate)/365
+
+extract(day from hiredate)=3;
+
+year(hiredate) in (1981,1983);
+month(hiredate)=9
+round(max(sal)) 'maximum'
+
+count total no of managers
+select count(*) 'total no of managers' from emp where job='manager
+
+
+'^a.*s$| ^..n?.*[ns]$'
+
+3rd highest paid
+order by sal desc limit 2,1;
+
+ascii value of first character of job
+select ascii(ename) from emp;
+
+concat(lower(substr(ename,1,3),substr(job,1,3)))
+
+
+foreign key sid(sid) references student(sid),
+foreign key cid(cid) references course(cid)
+
+## Create empty table emp10 with table structure same as emp table. 
+create table emp10 as (select * from emp where 1=2);
+
+
+ALTER TABLE table_name
+ADD CONSTRAINT constraint_name PRIMARY KEY (column_name);
+
+ALTER TABLE table_name
+ADD CONSTRAINT constraint_name FOREIGN KEY (column_name) 
+REFERENCES parent_table (parent_column);
+
+-- Add primary key to Orders table
+ALTER TABLE Orders
+ADD CONSTRAINT pk_OrderId PRIMARY KEY (OrderId);
+
+-- Add foreign key to Orders table
+ALTER TABLE Orders
+ADD CONSTRAINT fk_CustomerId FOREIGN KEY (CustomerId)
+REFERENCES Customers(CustomerId);
+
+##add new column in emp table netsal with constraint default 1000
+ALTER TABLE table_name
+ADD CONSTRAINT constraint_name PRIMARY KEY (column_name);
+
+update emp set sal= 2000 where id=10;
+
+
+alter table emp add netsal double(9,2) default "1000";
+
+second last position: "%r_"
+"^s.*l.*s$": starts with s , ends with s and somewhere l in  between
+
+second  position:"_i%";
