@@ -1,0 +1,94 @@
+
+mysql> create table product_tr(serialid serial primary key,productid int,old_pname varchar(10), new_pname varchar(10),
+    -> old_price decimal(10,2), new_price decimal(9,2), chdate timestamp default current_timestamp, username varchar(19));//
+Query OK, 0 rows affected (0.10 sec)
+
+
+DELIMITER //
+mysql>
+mysql> CREATE TRIGGER insertproduct
+    -> AFTER INSERT ON product
+    -> FOR EACH ROW
+    -> BEGIN
+    ->     INSERT INTO product_tr(productid, old_pname, new_pname, old_price, new_price, chdate, username)
+    ->     VALUES (NEW.ProductId, NULL, NEW.PName, NULL, NEW.Price, CURRENT_TIMESTAMP, CURRENT_USER());
+    -> END;
+    ->
+    -> //
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> insert into product values(32,"noodles",120);
+Query OK, 1 row affected (0.07 sec)
+
+mysql> select * from product_tr;
++----------+-----------+-----------+-----------+-----------+-----------+---------------------+----------------+
+| serialid | productid | old_pname | new_pname | old_price | new_price | chdate              | username       |
++----------+-----------+-----------+-----------+-----------+-----------+---------------------+----------------+
+|        1 |        32 | NULL      | noodles   |      NULL |    120.00 | 2024-08-12 18:05:16 | root@localhost |
++----------+-----------+-----------+-----------+-----------+-----------+---------------------+----------------+
+1 row in set (0.00 sec)
+
+
+
+#### This trigger will be executed before a new row is inserted into the product table. It can be used to modify or validate the data before it is actually inserted.
+DELIMITER //
+
+CREATE TRIGGER before_insert_product 
+BEFORE INSERT ON product 
+FOR EACH ROW 
+BEGIN
+    -- Example: Automatically set a default product name if it is not provided
+    IF NEW.PName IS NULL OR NEW.PName = '' THEN
+        SET NEW.PName = 'DefaultName';
+    END IF;
+    
+    -- Example: Ensure the price is non-negative
+    IF NEW.Price < 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Price cannot be negative';
+    END IF;
+END;
+//
+DELIMITER ;
+
+BEFORE DELETE Trigger
+This trigger will be executed before a row is deleted from the product table. It can be used to validate or prevent deletion under certain conditions.
+
+DELIMITER //
+
+CREATE TRIGGER before_delete_product 
+BEFORE DELETE ON product 
+FOR EACH ROW 
+BEGIN
+    -- Example: Prevent deletion of a product with a specific condition
+    IF OLD.Price < 10 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot delete products with a price below 10';
+    END IF;
+    
+    -- Example: Log the deletion attempt (Optional)
+    INSERT INTO product_tr(productid, old_pname, new_pname, old_price, new_price, chdate, username) 
+    VALUES (OLD.ProductId, OLD.PName, NULL, OLD.Price, NULL, CURRENT_TIMESTAMP, CURRENT_USER());
+END;
+
+//
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE TRIGGER after_delete_product 
+AFTER DELETE ON product 
+FOR EACH ROW 
+BEGIN 
+    INSERT INTO product_tr(productid, old_pname, new_pname, old_price, new_price, chdate, username) 
+    VALUES (OLD.ProductId, OLD.PName, NULL, OLD.Price, NULL, CURRENT_TIMESTAMP, CURRENT_USER());
+END;
+
+//
+
+DELIMITER ;
+
+
+
+
+
