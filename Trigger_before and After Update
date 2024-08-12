@@ -1,0 +1,86 @@
+foreign key fid(fid) references p(pk)
+on delete cascade;
+
+UPDATE person SET salary = 8000  WHERE personid = 12; 
+
+create table product_trig(serialid serial primary key,productid int,old_pname varchar(10), new_pname varchar(10),
+old_price decimal(10,2), new_price decimal(9,2), chdate timestamp default current_timestamp, username varchar(19));
+
+delimiter //
+mysql> create trigger after_updates after update on product for each row
+    -> begin
+    -> insert into product_trig(productid, old_pname, new_pname, old_price,
+    -> new_price, chdate , username) values (old.productid,old.pname,new.pname,
+    -> old.price,new.price,current_timestamp,current_user());
+    -> end;
+    -> //
+
+mysql> select * from product;
++-----------+--------+-------+
+| ProductId | PName  | Price |
++-----------+--------+-------+
+|         1 | lays   | 30.24 |
+|         2 | chiffs | 35.46 |
++-----------+--------+-------+
+2 rows in set (0.03 sec)
+
+mysql> select * from product_trig;
+Empty set (0.01 sec)
+
+mysql> delimiter //
+mysql> create trigger after_updates after update on product for each row
+    -> begin
+    -> insert into product_trig(productid, old_pname, new_pname, old_price,
+    -> new_price, chdate , username) values (old.productid,old.pname,new.pname,
+    -> old.price,new.price,current_timestamp,current_user());
+    -> end;
+    -> //
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> UPDATE product SET price = 80 WHERE productid = 2;
+    -> //
+Query OK, 1 row affected (0.02 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> select * from product_trig;
+    -> //
++----------+-----------+-----------+-----------+-----------+-----------+---------------------+----------------+
+| serialid | productid | old_pname | new_pname | old_price | new_price | chdate              | username       |
++----------+-----------+-----------+-----------+-----------+-----------+---------------------+----------------+
+|        1 |         2 | chiffs    | chiffs    |     35.46 |     80.00 | 2024-08-12 14:25:57 | root@localhost |
++----------+-----------+-----------+-----------+-----------+-----------+---------------------+----------------+
+1 row in set (0.00 sec)
+
+mysql>
+
+
+create trigger before_updates before update on product for each row
+    -> begin
+    -> insert into product_trig(productid, old_pname, new_pname, old_price,
+    -> new_price, chdate , username) values (old.productid,old.pname,new.pname,
+    -> old.price,new.price,current_timestamp,current_user());
+    -> end;
+    -> //
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> UPDATE product SET price = 100 WHERE productid = 1;
+    -> //
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> select * from product_trig;
+    -> //
++----------+-----------+-----------+-----------+-----------+-----------+---------------------+----------------+
+| serialid | productid | old_pname | new_pname | old_price | new_price | chdate              | username       |
++----------+-----------+-----------+-----------+-----------+-----------+---------------------+----------------+
+|        1 |         2 | chiffs    | chiffs    |     35.46 |     80.00 | 2024-08-12 14:25:57 | root@localhost |
+|        2 |         1 | lays      | lays      |     30.24 |    100.00 | 2024-08-12 15:03:47 | root@localhost |
+|        3 |         1 | lays      | lays      |     30.24 |    100.00 | 2024-08-12 15:03:47 | root@localhost |
++----------+-----------+-----------+-----------+-----------+-----------+---------------------+----------------+
+
+
+^a.*s$| ^..?n.*[NS]$
+concat(lower(substr(ename,1,3),substr(job,1,3))
+
+create view viewname as select empno, ename, job, comm from emp where comm is not null;
+
