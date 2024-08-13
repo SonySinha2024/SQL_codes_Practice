@@ -1,0 +1,39 @@
+DELETE FROM emp
+WHERE dept = (SELECT dept FROM emp WHERE name = 'Allen');
+
+List all employees with salary greater than either Smith's salary or Alan's salary:
+
+SELECT * FROM emp
+WHERE salary > (SELECT salary FROM emp WHERE name = 'Smith' OR salary > (SELECT salary FROM emp WHERE name = 'Alan');
+
+mysql> update  person set salary =(select salary from person where lastname='dsouza') where lastname='sharma'//
+ERROR 1093 (HY000): You can't specify target table 'person' for update in FROM clause
+
+mysql> update person set salary =(select salary from(select * from person) e where e.firstname="bobby") where firstname="sia" //
+Query OK, 1 row affected (0.01 sec)
+
+###### FUNCTIONS
+create function calculateEXP(hdt date) returns int
+begin 
+return floor(datediff(curdate(),hdt)/365);
+end //
+
+select calculateEXP(hiredate) from emp;
+
+create function additionalAllownace(salary double, hdt date)
+returns double
+begin
+declare vexp int;
+declare vsal double(9,2) default 0;
+set vexp=calculateEXP(hdt);
+if vexp>35 and vexp<=42 then set vsal=salary*1.10;
+elseif vexp>38 and vexp<=42 then set vsal=salary*1.20;
+elseif vexp>42 then set vsal=salary*1.30;
+endif;
+return vsal+0.15*salary+0.20*salary+0.08*salary;
+end //
+
+to see result
+select empno, ename, sal, hiredate, additionalAllowance(sal,hiredate) from emp;
+
+
