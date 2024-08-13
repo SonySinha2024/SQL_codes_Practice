@@ -1,3 +1,18 @@
+
+UPDATE person 
+SET des = CASE 
+    WHEN personid = 13 THEN 'clerk'
+    WHEN personid = 11 THEN 'manager'
+    WHEN personid = 12 THEN 'manager'
+    WHEN personid = 14 THEN 'manager'
+    WHEN personid = 21 THEN 'clerk'
+    WHEN personid = 22 THEN 'clerk'
+    WHEN personid = 23 THEN 'manager'
+    else null
+    END;
+
+
+
 mysql> UPDATE item
     -> SET
     ->     personid = CASE
