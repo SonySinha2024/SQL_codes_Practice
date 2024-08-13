@@ -1,0 +1,172 @@
+DISTINCT Mondays
+where dayname(hiredate)='monday';
+
+
+mysql> SELECT DATE_FORMAT(CURDATE(), '%Y-%m-01') AS FirstDayOfMonth;
++-----------------+
+| FirstDayOfMonth |
++-----------------+
+| 2024-08-01      |
++-----------------+
+1 row in set (0.02 sec)
+
+mysql> SELECT DATE_FORMAT(CURDATE(), '%Y-%m-02') AS FirstDayOfMonth;
++-----------------+
+| FirstDayOfMonth |
++-----------------+
+| 2024-08-02      |
++-----------------+
+1 row in set (0.00 sec)
+
+
+ select date_format(date_sub(curdate(), interval 3 month),'%Y-%m-01') 'TY';
++------------+
+| TY         |
++------------+
+| 2024-05-01 |
++------------+
+
+
+mysql> SELECT LAST_DAY(CURDATE()) AS LastDayOfMonth;
++----------------+
+| LastDayOfMonth |
++----------------+
+| 2024-08-31     |
++----------------+
+1 row in set (0.00 sec)
+
+mysql> select last_day('2024-09-01');
++------------------------+
+| last_day('2024-09-01') |
++------------------------+
+| 2024-09-30             |
++------------------------+
+1 row in set (0.00 sec)
+
+
+SELECT LAST_DAY(DATE_SUB(CURDATE(), INTERVAL 3 MONTH)) AS LastDayOfMonthAfterThreeMonths;
++--------------------------------+
+| LastDayOfMonthAfterThreeMonths |
++--------------------------------+
+| 2024-05-31                     |
++--------------------------------+
+1 row in set (0.00 sec)
+
+
+ SELECT LAST_DAY(DATE_ADD(CURDATE(), INTERVAL 3 MONTH)) AS LastDayOfMonthAfterThreeMonths;
++--------------------------------+
+| LastDayOfMonthAfterThreeMonths |
++--------------------------------+
+| 2024-11-30                     |
++--------------------------------+
+1 row in set (0.00 sec)
+
+
+
+ select DATE_FORMAT(curdate(),'%Y-01-01');
++-----------------------------------+
+| DATE_FORMAT(curdate(),'%Y-01-01') |
++-----------------------------------+
+| 2024-01-01                        |
++-----------------------------------+
+1 row in set (0.00 sec)
+
+mysql> select LAST_DAY(curdate());
++---------------------+
+| LAST_DAY(curdate()) |
++---------------------+
+| 2024-08-31          |
++---------------------+
+1 row in set (0.00 sec)
+
+select LAST_DAY(DATE_FORMAT(curdate(),'%Y-12-31'));
++---------------------------------------------+
+| LAST_DAY(DATE_FORMAT(curdate(),'%Y-12-31')) |
++---------------------------------------------+
+| 2024-12-31                                  |
++---------------------------------------------+
+1 row in set (0.00 sec)
+
+
+ SELECT DATE_FORMAT(CURDATE(),'%M%d,%Y');
++----------------------------------+
+| DATE_FORMAT(CURDATE(),'%M%d,%Y') |
++----------------------------------+
+| August13,2024                    |
++----------------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT DATE_FORMAT(CURDATE(),'%M %d,%Y');
++-----------------------------------+
+| DATE_FORMAT(CURDATE(),'%M %d,%Y') |
++-----------------------------------+
+| August 13,2024                    |
++-----------------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT DATE_FORMAT(CURDATE(),'%m %D,%y');
++-----------------------------------+
+| DATE_FORMAT(CURDATE(),'%m %D,%y') |
++-----------------------------------+
+| 08 13th,24                        |
++-----------------------------------+
+1 row in set (0.00 sec)
+
+
+ select concat(dayname(curdate())," ",date_format(curdate(),'%M %Y'));
++---------------------------------------------------------------+
+| concat(dayname(curdate())," ",date_format(curdate(),'%M %Y')) |
++---------------------------------------------------------------+
+| Tuesday August 2024                                           |
++---------------------------------------------------------------+
+1 row in set (0.01 sec)
+
+
+ SELECT DATE_FORMAT(CURDATE(),'%m/%d/%y');
++-----------------------------------+
+| DATE_FORMAT(CURDATE(),'%m/%d/%y') |
++-----------------------------------+
+| 08/13/24                          |
++-----------------------------------+
+1 row in set (0.00 sec)
+
+
+ select concat(dayname('2023-12-06')," ",date_format(curdate(),'%M %Y')," " ,TIME_FORMAT(NOW(), '%H:%i:%s'));
++------------------------------------------------------------------------------------------------------+
+| concat(dayname('2023-12-06')," ",date_format(curdate(),'%M %Y')," " ,TIME_FORMAT(NOW(), '%H:%i:%s')) |
++------------------------------------------------------------------------------------------------------+
+| Wednesday August 2024 17:11:42                                                                       |
++------------------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+
+mysql> select concat(dayname('2023-12-06')," ",date_format(curdate(),'%M %Y')," " ,TIME_FORMAT(NOW(), '%l:%i:%s %p'));
++---------------------------------------------------------------------------------------------------------+
+| concat(dayname('2023-12-06')," ",date_format(curdate(),'%M %Y')," " ,TIME_FORMAT(NOW(), '%l:%i:%s %p')) |
++---------------------------------------------------------------------------------------------------------+
+| Wednesday August 2024 5:13:16 PM                                                                        |
++---------------------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+
+
+
+
+
+
+
+mysql> SELECT DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE()) - 1 DAY) AS FirstDayOfMonth;
++-----------------+
+| FirstDayOfMonth |
++-----------------+
+| 2024-08-01      |
++-----------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE()) - 2 DAY) AS FirstDayOfMonth;
++-----------------+
+| FirstDayOfMonth |
++-----------------+
+| 2024-08-02      |
++-----------------+
+1 row in set (0.00 sec)
