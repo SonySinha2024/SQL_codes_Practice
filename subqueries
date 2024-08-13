@@ -1,0 +1,73 @@
+ALTER TABLE table_name DROP COLUMN column_name;
+
+SELECT e.* FROM emp e JOIN dept d ON e.deptno = d.deptno WHERE d.dname = 'Purchase';
+self join
+ select * from person p where salary >(select avg(salary) from person pp where p.deptname=pp.deptname)//
++----------+-----------+----------+--------+----------+
+| personid | FirstName | LastName | salary | deptname |
++----------+-----------+----------+--------+----------+
+|       12 | vimani    | Garg     |   8000 | store    |
+|       22 | John      | Dsouza   |   5500 | store    |
++----------+-----------+----------+--------+----------+
+list all employees who earn more than average salary of their own department
+
+select * from emp  e where sal>(select avg(sal) from emp m where e.deptno=m.deptno);
+
+list all employees who earn sal < than their managers salary
+SELECT e.ename AS Employee, e.sal AS Employee_Salary, m.ename AS Manager, m.sal AS Manager_Salary
+FROM emp e
+JOIN emp m ON e.mgr = m.empno
+WHERE e.sal < m.sal;
+
+or
+select * from emp  e where sal>(select avg(sal) from emp m where m.job=e.job);
+
+
+Foreign key
+
+create table product (
+     pid int primary key,
+     pname varchar(50),
+     price int,
+     qty int,
+     cid int,
+     sid int,
+     constraint cust foreign key fk(cid) references category(cid)
+     on delete cascade
+     on update cascade, constraint sale foreign key(sid) references salesman(sid)
+        on delete cascade on update cascade);
+
+on delete set null;
+
+### display all salesman who do not sold any product
+
+select * from salesman s where not exists(select * from product p where p.sid=s.sid);
+
+
+add new column in salesman table by name credit limit
+
+alter table tablename add credit_limit int after city;
+alter table tablename modify credit double(15,2) after city;
+ 
+
+year in which more than 10 employees joined
+
+group by year(hiredate) having count(*)>10;
+
+date of first salary of the employees
+date_add(hiredate,interval 1 month) as salaryDate
+
+
+select deptno, year(hiredate), count(year(hiredate))
+from emp group by year(hiredate),deptno;
+
+#### indexes
+create index indexname on tablename(columnname)
+
+create view viewname as select....
+select * from viewname;
+
+
+savepoint a;
+rollback savepoint a;
+
