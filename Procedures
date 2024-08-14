@@ -1,0 +1,182 @@
+
+mysql> delimiter //
+mysql> create procedure insert_data(Pproductid int , Ppname varchar(12), PPrice double(8,2))
+    -> begin
+    -> insert into product(productid,pname,price)values(Pproductid, Ppname, PPrice);
+    -> end;
+    -> //
+Query OK, 0 rows affected, 1 warning (0.10 sec)
+
+mysql> call insert_data(33,'snacks',90)//
+Query OK, 1 row affected (0.02 sec)
+
+mysql> select * from product //
++-----------+---------+--------+
+| ProductId | PName   | Price  |
++-----------+---------+--------+
+|         1 | lays    | 100.00 |
+|         2 | chiffs  |  80.00 |
+|        32 | noodles | 120.00 |
+|        33 | snacks  |  90.00 |
++-----------+---------+--------+
+4 rows in set (0.00 sec)
+
+===================================================
+
+SHOW TRIGGERS LIKE 'product';
+==================================
+
+delimiter //
+mysql> create procedure delete_datas_per(in ppersonid int)
+    -> begin
+    -> delete from person where personid=ppersonid;
+    -> end;
+    -> //
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> call delete_datas_per(13) //
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select * from person //
++----------+-----------+--------+---------+
+| personid | FirstName | salary | des     |
++----------+-----------+--------+---------+
+|       11 | Bobby     |   5000 | manager |
+|       12 | vimani    |   8000 | manager |
+|       14 | sia       |   5000 | manager |
+|       21 | Joe       |   5500 | clerk   |
+|       22 | John      |   5500 | clerk   |
+|       23 | Mona      |   5500 | manager |
++----------+-----------+--------+---------+
+6 rows in set (0.00 sec)
+
+=====================================================
+ DELIMITER //
+mysql>
+mysql> CREATE PROCEDURE display_persons_with_salary(IN min_salary INT)
+    -> BEGIN
+    ->     SELECT * FROM person WHERE salary > min_salary;
+    -> END //
+Query OK, 0 rows affected (0.03 sec)
+
+mysql>
+mysql> DELIMITER ;
+mysql> CALL display_persons_with_salary(5500);
++----------+-----------+--------+---------+
+| personid | FirstName | salary | des     |
++----------+-----------+--------+---------+
+|       12 | vimani    |   8000 | manager |
++----------+-----------+--------+---------+
+1 row in set (0.01 sec)
+
+Query OK, 0 rows affected (0.01 sec)
+
+=========================
+
+ CREATE PROCEDURE display(IN input_salary DOUBLE(6,2))
+    -> BEGIN
+    ->     DECLARE pid INT;
+    ->     DECLARE pname VARCHAR(12);
+    ->     DECLARE psal DOUBLE(6,2);  -- Local variable to hold the salary
+    ->     DECLARE vstop INT DEFAULT 0;
+    ->     DECLARE pdes VARCHAR(10);
+    ->
+    ->     DECLARE person_cur CURSOR FOR
+    ->         SELECT personid, firstname, salary, des FROM person
+    ->         WHERE salary > input_salary;
+    ->
+    ->     DECLARE CONTINUE HANDLER FOR NOT FOUND SET vstop = 1;
+    ->
+    ->     OPEN person_cur;
+    ->
+    ->     read_loop: LOOP
+    ->         FETCH person_cur INTO pid, pname, psal, pdes;
+    ->
+    ->         IF vstop THEN
+    ->             LEAVE read_loop;
+    ->         END IF;
+    ->
+    ->         SELECT pid AS personid, pname AS firstname, psal AS salary, pdes AS des;
+    ->
+    ->     END LOOP;
+    ->
+    ->     CLOSE person_cur;
+    -> END //
+Query OK, 0 rows affected, 2 warnings (0.03 sec)
+
+mysql>
+mysql> DELIMITER ;
+mysql> delimiter //
+mysql> call display(5000)//
++----------+-----------+---------+---------+
+| personid | firstname | salary  | des     |
++----------+-----------+---------+---------+
+|       12 | vimani    | 8000.00 | manager |
++----------+-----------+---------+---------+
+1 row in set (0.00 sec)
+
++----------+-----------+---------+-------+
+| personid | firstname | salary  | des   |
++----------+-----------+---------+-------+
+|       21 | Joe       | 5500.00 | clerk |
++----------+-----------+---------+-------+
+1 row in set (0.01 sec)
+
++----------+-----------+---------+-------+
+| personid | firstname | salary  | des   |
++----------+-----------+---------+-------+
+|       22 | John      | 5500.00 | clerk |
++----------+-----------+---------+-------+
+1 row in set (0.02 sec)
+
++----------+-----------+---------+---------+
+| personid | firstname | salary  | des     |
++----------+-----------+---------+---------+
+|       23 | Mona      | 5500.00 | manager |
++----------+-----------+---------+---------+
+1 row in set (0.03 sec)
+
+Query OK, 0 rows affected (0.04 sec)
+===================
+
+mysql> create procedure minmaxavgcount(in id int, out maxsal double(8,2),
+    -> out minsal double(8,2), out avgsal double(8,2), out counts int)
+    ->
+    -> begin
+    -> select min(salary), max(salary), avg(salary), count(productid)
+    -> into minsal, maxsal,avgsal,counts from person where
+    -> personid= id;
+    -> end;
+    -> //
+Query OK, 0 rows affected, 3 warnings (0.02 sec)
+
+mysql> call minmaxavgcount(23,@minsal,@maxsal,@avgsal,@counts) //
+ERROR 1054 (42S22): Unknown column 'productid' in 'field list'
+mysql> create procedure minmaxavgcounts(in id int, out maxsal double(8,2),
+    -> out minsal double(8,2), out avgsal double(8,2), out counts int)
+    ->
+    -> begin
+    -> select min(salary), max(salary), avg(salary), count(personid)
+    -> into minsal, maxsal,avgsal,counts from person where
+    -> personid= id;
+    -> end;
+    -> //
+Query OK, 0 rows affected, 3 warnings (0.02 sec)
+
+mysql>
+mysql> call minmaxavgcounts(23,@minsal,@maxsal,@avgsal,@counts) //
+Query OK, 1 row affected (0.01 sec)
+
+
+mysql> select @minsal,@maxsal,@avgsal,@counts //
++---------+---------+---------+---------+
+| @minsal | @maxsal | @avgsal | @counts |
++---------+---------+---------+---------+
+|    5500 |    5500 |    5500 |       1 |
++---------+---------+---------+---------+
+1 row in set (0.00 sec)
+===================================================
+
+
+
+
