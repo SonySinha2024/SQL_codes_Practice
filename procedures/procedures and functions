@@ -1,0 +1,256 @@
+mysql> create procedure status_dis()
+    -> begin
+    -> declare ppersonid int;
+    -> declare pfirstname, pdes varchar(15);
+    -> declare psalary double(9,2);
+    -> declare phiredate date;
+    -> declare vstop int default 0;
+    -> declare vstatus varchar(12);
+    -> declare vavg double(8,2);
+    ->
+    -> declare status_c cursor for
+    -> select personid, firstname, salary, des, hiredate from person;
+    ->
+    -> declare continue handler for not found set vstop=1;
+    ->
+    -> open status_c;
+    ->
+    -> read_loop:loop
+    -> fetch status_c into ppersonid, pfirstname, psalary,pdes, phiredate;
+    -> if vstop then leave read_loop;
+    -> end if;
+    -> select avg(salary) as vavg from person where
+    -> personid=ppersonid;
+    ->
+    -> if psalary<vavg then set vstatus='lesser';
+    -> elseif psalary=vavg then set vstatus='equal';
+    -> else set vstatus = 'more';
+    -> end if;
+    -> select ppersonid, pfirstname, psalary,pdes,phiredate,vstatus;
+    -> end loop;
+    -> close status_c;
+    -> end;
+    ->
+    -> //
+Query OK, 0 rows affected, 2 warnings (0.02 sec)
+
+mysql> call status_dis()//
++------+
+| vavg |
++------+
+| 5000 |
++------+
+1 row in set (0.01 sec)
+
++-----------+------------+---------+---------+------------+---------+
+| ppersonid | pfirstname | psalary | pdes    | phiredate  | vstatus |
++-----------+------------+---------+---------+------------+---------+
+|        11 | Bobby      | 5000.00 | manager | 2002-08-09 | more    |
++-----------+------------+---------+---------+------------+---------+
+1 row in set (0.01 sec)
+
++------+
+| vavg |
++------+
+| 8000 |
++------+
+1 row in set (0.02 sec)
+
++-----------+------------+---------+---------+------------+---------+
+| ppersonid | pfirstname | psalary | pdes    | phiredate  | vstatus |
++-----------+------------+---------+---------+------------+---------+
+|        12 | vimani     | 8000.00 | manager | 2001-09-08 | more    |
++-----------+------------+---------+---------+------------+---------+
+1 row in set (0.02 sec)
+
++------+
+| vavg |
++------+
+| 5000 |
++------+
+1 row in set (0.03 sec)
+
++-----------+------------+---------+---------+------------+---------+
+| ppersonid | pfirstname | psalary | pdes    | phiredate  | vstatus |
++-----------+------------+---------+---------+------------+---------+
+|        14 | sia        | 5000.00 | manager | 2003-09-08 | more    |
++-----------+------------+---------+---------+------------+---------+
+1 row in set (0.03 sec)
+
++------+
+| vavg |
++------+
+| 5500 |
++------+
+1 row in set (0.03 sec)
+
++-----------+------------+---------+-------+------------+---------+
+| ppersonid | pfirstname | psalary | pdes  | phiredate  | vstatus |
++-----------+------------+---------+-------+------------+---------+
+|        21 | Joe        | 5500.00 | clerk | 2001-11-08 | more    |
++-----------+------------+---------+-------+------------+---------+
+1 row in set (0.03 sec)
+
++------+
+| vavg |
++------+
+| 5500 |
++------+
+1 row in set (0.04 sec)
+
++-----------+------------+---------+-------+------------+---------+
+| ppersonid | pfirstname | psalary | pdes  | phiredate  | vstatus |
++-----------+------------+---------+-------+------------+---------+
+|        22 | John       | 5500.00 | clerk | 2001-09-28 | more    |
++-----------+------------+---------+-------+------------+---------+
+1 row in set (0.04 sec)
+
++------+
+| vavg |
++------+
+| 5500 |
++------+
+1 row in set (0.05 sec)
+
++-----------+------------+---------+---------+------------+---------+
+| ppersonid | pfirstname | psalary | pdes    | phiredate  | vstatus |
++-----------+------------+---------+---------+------------+---------+
+|        23 | Mona       | 5500.00 | manager | 2003-09-08 | more    |
++-----------+------------+---------+---------+------------+---------+
+1 row in set (0.05 sec)
+
+Query OK, 0 rows affected (0.05 sec)
+
+> if psalary>vavg then set vstatus='greater';
+    -> elseif psalary=vavg then set vstatus='equal';
+    -> else set vstatus='less';
+    -> end if;
+    ->
+    -> select ppersonid, pfirstname, psalary, pdes, phiredate, vstatus;
+    ->
+    -> end loop;
+    -> close stat_cu;
+    ->
+    -> if vstop=1 then signal sqlstate '45000'
+    -> set message_text='table is empty';
+    -> end if;
+    -> end;
+    -> //
+=======================================
+
+ set global log_bin_trust_function_creators=1 //
+Query OK, 0 rows affected (0.00 sec)
+
+
+mysql> create function additional_all(psal double(8,2),hdt date) returns double
+    -> begin
+    -> declare vexp int ;
+    -> declare vexp_allowance double(8,2) default 0;
+    ->
+    -> set vexp=calculate_Exper(hdt);
+    -> if vexp =20 then set vexp_allowance=psal*1.20;
+    -> elseif vexp=22 then set vexp_allowance=psal*1.30;
+    -> else set vexp_allowance =psal*0;
+    -> end if;
+    -> return psal+vexp_allowance;
+    -> end //
+Query OK, 0 rows affected, 2 warnings (0.05 sec)
+
+mysql> select personid,firstname, additional_all(salary,hiredate) from person//
++----------+-----------+---------------------------------+
+| personid | firstname | additional_all(salary,hiredate) |
++----------+-----------+---------------------------------+
+|       11 | Bobby     |                           11500 |
+|       12 | vimani    |                           18400 |
+|       14 | sia       |                           11000 |
+|       21 | Joe       |                           12650 |
+|       22 | John      |                           12650 |
+|       23 | Mona      |                           12100 |
++----------+-----------+---------------------------------+
+
+========================================================================
+ create procedure updatesalary()
+    -> begin
+    -> declare ppersonid int;
+    -> declare pfirstname,pdes varchar(12);
+    -> declare psalary ,vsal double(8,2) default 0;
+    -> declare phiredate date;
+    -> declare vexp int  ;
+    -> declare vstop int default 0 ;
+    ->
+    ->
+    -> declare cur_upt cursor for
+    -> select personid, firstname,salary,hiredate,des from person;
+
+    ->
+    -> declare continue handler for not found set vstop=1;
+    -> open cur_upt;
+    -> read_loop:loop
+    -> fetch cur_upt into ppersonid, pfirstname, psalary,phiredate,pdes;
+    -> if vstop then leave read_loop;
+    -> end if;
+    -> set vexp=calculate_Exper(phiredate);
+    -> if vexp=20 then set psalary=psalary*1.20;
+    -> update person set salary=psalary where personid=ppersonid;
+    -> elseif vexp=22 then set psalary=psalary*1.30;
+    -> update person set salary=psalary where personid=ppersonid;
+    -> else set psalary=psalary*1.1;
+    -> update person set salary=psalary where personid=ppersonid;
+    -> end if;
+    -> select ppersonid, pfirstname, psalary,phiredate,pdes;
+    -> end loop;
+    -> close cur_upt;
+    -> if vstop=1 then signal sqlstate '45000' set message_text='empty';
+    -> end if;
+    -> end;
+    ->
+    -> //
+Query OK, 0 rows affected, 1 warning (0.03 sec)
+
+mysql> call updatesalary()//
++-----------+------------+---------+------------+---------+
+| ppersonid | pfirstname | psalary | phiredate  | pdes    |
++-----------+------------+---------+------------+---------+
+|        11 | Bobby      | 6500.00 | 2002-08-09 | manager |
++-----------+------------+---------+------------+---------+
+1 row in set (0.03 sec)
+
++-----------+------------+----------+------------+---------+
+| ppersonid | pfirstname | psalary  | phiredate  | pdes    |
++-----------+------------+----------+------------+---------+
+|        12 | vimani     | 10400.00 | 2001-09-08 | manager |
++-----------+------------+----------+------------+---------+
+1 row in set (0.04 sec)
+
++-----------+------------+---------+------------+---------+
+| ppersonid | pfirstname | psalary | phiredate  | pdes    |
++-----------+------------+---------+------------+---------+
+|        14 | sia        | 6000.00 | 2003-09-08 | manager |
++-----------+------------+---------+------------+---------+
+1 row in set (0.05 sec)
+
++-----------+------------+---------+------------+-------+
+| ppersonid | pfirstname | psalary | phiredate  | pdes  |
++-----------+------------+---------+------------+-------+
+|        21 | Joe        | 7150.00 | 2001-11-08 | clerk |
++-----------+------------+---------+------------+-------+
+1 row in set (0.05 sec)
+
++-----------+------------+---------+------------+-------+
+| ppersonid | pfirstname | psalary | phiredate  | pdes  |
++-----------+------------+---------+------------+-------+
+|        22 | John       | 7150.00 | 2001-09-28 | clerk |
++-----------+------------+---------+------------+-------+
+1 row in set (0.06 sec)
+
++-----------+------------+---------+------------+---------+
+| ppersonid | pfirstname | psalary | phiredate  | pdes    |
++-----------+------------+---------+------------+---------+
+|        23 | Mona       | 6600.00 | 2003-09-08 | manager |
++-----------+------------+---------+------------+---------+
+1 row in set (0.07 sec)
+
+ERROR 1644 (45000): empty
+mysql>
+
+
