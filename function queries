@@ -1,0 +1,72 @@
+insert into patients values (STR_TO_DATE('24-May-2022', '%d-%M-%Y'),
+
+#Write a query to display the patients’ age along with the logarithmic value (base 10) of their age.
+select   log10(age) as logage from patients;
+
+#Write a query to return NULL if the patient’s name and doctor’s name are similar else return the patient’s name.
+select if (patient_name =doctor_name, 'yes','no') from patients;
+
+select  patient_name, doctor_name , case when patient_name =doctor_name THEN 'NULL' WHEN patient_name<>doctor_name THEN patient_name  end FROM  patients;
+
+#Write a query to return Yes if the patient’s age is greater than 40 else return No.
+select  age, case when age >40 THEN 'Yes' WHEN age <40 THEN 'No' end FROM  patients;
+=========================================================
+
+/ EMPLOYEE WITH Nth HIGHEST SALARY
+SELECT name, salary FROM employee ORDER BY salary DESC LIMIT (N-1), 1;
+
+select ifnull((select distinct Salary from Employee order by Salary desc limit 1 offset 1),null) as SecondHighestSalary;
+
+ create function nth_highest(n int) returns int
+    -> begin
+    -> declare m int;
+    -> set m=n-1;
+    -> return(select distinct salary from person order by salary desc limit 1 offset m);
+    -> end //
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> select   nth_highest(3) from person//
++----------------+
+| nth_highest(3) |
++----------------+
+|           6600 |
+|           6600 |
+|           6600 |
+|           6600 |
+|           6600 |
+|           6600 |
++----------------+
+=============================================
+select firstname, salary, dense_rank() over(order by salary desc) 'ranks' from person//
++-----------+--------+-------+
+| firstname | salary | ranks |
++-----------+--------+-------+
+| vimani    |  10400 |     1 |
+| Joe       |   7150 |     2 |
+| John      |   7150 |     2 |
+| Mona      |   6600 |     3 |
+| Bobby     |   6500 |     4 |
+| sia       |   6000 |     5 |
++-----------+--------+-------+
+=============================================
+Write a SQL query to find all numbers that appear at least three times 
+consecutively.
+
+SELECT DISTINCT Num
+FROM (
+    SELECT Num, 
+           LAG(Num) OVER (ORDER BY Id) AS PrevNum,
+           LEAD(Num) OVER (ORDER BY Id) AS NextNum
+    FROM Logs
+) AS ConsecutiveNums
+WHERE Num = PrevNum AND Num = NextNum;
+===============================================
+ Employees Earning More Than Their Managers
+select * from person where salary >(select max(salary) from person pp where pp.des='manager')//
++----------+-----------+--------+-------+------------+
+| personid | FirstName | salary | des   | hiredate   |
++----------+-----------+--------+-------+------------+
+|       22 | John      |  11000 | clerk | 2001-09-28 |
++----------+-----------+--------+-------+------------+
+
+
