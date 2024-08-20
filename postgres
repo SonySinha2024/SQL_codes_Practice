@@ -1,0 +1,29 @@
+UPDATE expense
+SET active = CASE 
+    WHEN id = 13 THEN TRUE
+    WHEN id = 11 THEN FALSE
+    WHEN id = 12 THEN TRUE
+    WHEN id = 19 THEN FALSE
+    WHEN id = 15 THEN TRUE
+    WHEN id = 16 THEN TRUE
+    WHEN id = 22 THEN FALSE
+    ELSE NULL
+END
+WHERE id IN (11, 12, 13, 15, 16, 19, 22);
+======================
+ALTER TABLE expense
+ADD COLUMN approval_date TIMESTAMP;
+=================================
+UPDATE expense
+SET approval_date = CASE 
+    WHEN id = 13 THEN TIMESTAMP '2021-08-22 18:30:00'
+    WHEN id = 11 THEN TIMESTAMP '2024-10-23 15:10:12'
+    WHEN id = 12 THEN TIMESTAMP '2022-08-23 18:30:00'
+    WHEN id = 19 THEN TIMESTAMP '2023-11-02 15:30:00'
+    WHEN id = 15 THEN TIMESTAMP '2024-05-12 13:30:00'
+    WHEN id = 16 THEN TIMESTAMP '2022-06-22 20:30:00'
+    WHEN id = 22 THEN TIMESTAMP '2021-12-22 21:20:00'
+    ELSE NULL
+END
+WHERE id IN (11, 12, 13, 15, 16, 19, 22);
+========================================================
