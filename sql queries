@@ -1,0 +1,129 @@
+select * from (select salary, dense_rank() over(order by salary desc)as ranking from person) as k
+    -> where ranking=3;
+    -> //
++--------+---------+
+| salary | ranking |
++--------+---------+
+|   6600 |       3 |
++--------+---------+
+1 row in set (0.00 sec)
+
+Displaying Employees with their Manager's Name
+
+SELECT e.employee_name, m.employee_name AS manager_name
+FROM employees e
+LEFT JOIN employees m ON e.manager_id = m.employee_id;
+
+===================
+
+Retrieving Employees in a Department with the Maximum Salary
+sql
+Copy code
+SELECT employee_id, employee_name, department_id, salary
+FROM employees
+WHERE department_id = (
+    SELECT department_id
+    FROM employees
+    GROUP BY department_id
+    ORDER BY MAX(salary) DESC
+    FETCH FIRST 1 ROWS ONLY
+);
+=================
+
+select e.name as empname, e.id as empid , m.mgrname as managername, e.salary as empsalary, m.mgrsalary as
+    -> 'manager salary',e.deptid  from employee e left join manager m on e.deptid=m.deptid where e.salary< m.mgrsalary
+    ->  order by e.salary desc;
++---------+-------+-------------+-----------+----------------+--------+
+| empname | empid | managername | empsalary | manager salary | deptid |
++---------+-------+-------------+-----------+----------------+--------+
+| taany   |    16 | kumar       |  28000.00 |       36000.00 |     12 |
+| john    |    20 | sinha       |  22000.00 |       56000.00 |     19 |
+| moti    |    18 | kumar       |  20000.00 |       36000.00 |     12 |
+| aan     |    15 | panch       |  18000.00 |       22000.00 |     10 |
++---------+-------+-------------+-----------+----------------+--------+
+==========================================================
+
+highest and lowest salary of each deptid
+> with max_min_salaries as(
+    -> select id, deptid, salary, row_number() over (partition by deptid order by salary desc) as max_rank,
+    -> row_number() over (partition by deptid order by salary asc) as min_rank from employee)
+    -> select id, deptid, salary from max_min_salaries where max_rank=1 or min_rank=1;
++----+--------+----------+
+| id | deptid | salary   |
++----+--------+----------+
+| 15 |     10 | 18000.00 |
+| 14 |     10 | 24000.00 |
+| 18 |     12 | 20000.00 |
+| 16 |     12 | 28000.00 |
+| 20 |     19 | 22000.00 |
++----+--------+----------+
+5 rows in set (0.00 sec)
+================================================
+#### check salary greater than 21000
+
+create procedure check_salary()
+    -> begin
+    -> declare vid , vdeptid,vage int;
+    -> declare vname varchar(20);
+    -> declare vsalary double(8,2);
+    -> declare vstop int default 0;
+    -> declare emp_cur cursor for
+    -> select id,name,age,deptid,salary from employee;
+    -> declare continue handler for not found set vstop=1;
+    -> open emp_cur;
+    -> read_loop:loop
+    -> fetch emp_cur into vid,vname,vage,vdeptid,vsalary;
+    -> if vstop then leave read_loop;
+    -> end if;
+    -> if vsalary<21000 then
+    -> select concat("Low salary ",vid) as message;
+    -> else
+    -> select concat("Good Salary",vid) as message;
+    -> end if;
+    -> end loop;
+    -> close emp_cur;
+    -> end //
+Query OK, 0 rows affected, 1 warning (0.01 sec)
+
+mysql> call check_salary()//
++---------------+
+| message       |
++---------------+
+| Good Salary12 |
++---------------+
+1 row in set (0.00 sec)
+
++---------------+
+| message       |
++---------------+
+| Good Salary14 |
++---------------+
+1 row in set (0.00 sec)
+
++---------------+
+| message       |
++---------------+
+| Low salary 15 |
++---------------+
+1 row in set (0.00 sec)
+
++---------------+
+| message       |
++---------------+
+| Good Salary16 |
++---------------+
+1 row in set (0.00 sec)
+
++---------------+
+| message       |
++---------------+
+| Low salary 18 |
++---------------+
+1 row in set (0.01 sec)
+
++---------------+
+| message       |
++---------------+
+| Good Salary20 |
++---------------+
+1 row in set (0.01 sec)
