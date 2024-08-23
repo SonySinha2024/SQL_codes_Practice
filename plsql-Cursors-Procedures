@@ -1,0 +1,123 @@
+DECLARE
+    CURSOR emp_cursor IS
+        SELECT employee_id, salary
+        FROM employees
+        WHERE department_id = 10;
+    v_salary employees.salary%TYPE;
+    v_emp_id employees.employee_id%TYPE;
+BEGIN
+    OPEN emp_cursor;
+    LOOP
+        FETCH emp_cursor INTO v_emp_id, v_salary;
+        EXIT WHEN emp_cursor%NOTFOUND;
+        IF v_salary < 3000 THEN
+            DBMS_OUTPUT.PUT_LINE('Low Salary for Employee ID: ' || v_emp_id);
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('Good Salary for Employee ID: ' || v_emp_id);
+        END IF;
+    END LOOP;
+    CLOSE emp_cursor;
+END;
+=======================================
+Cursor for Processing Employees Based on Date of Joining
+plsql
+
+DECLARE
+    CURSOR emp_cursor IS
+        SELECT employee_id, employee_name, hire_date
+        FROM employees
+        WHERE hire_date < ADD_MONTHS(SYSDATE, -12);  -- Employees who joined more than a year ago
+
+    v_emp_id employees.employee_id%TYPE;
+    v_emp_name employees.employee_name%TYPE;
+    v_hire_date employees.hire_date%TYPE;
+BEGIN
+    OPEN emp_cursor;
+    LOOP
+        FETCH emp_cursor INTO v_emp_id, v_emp_name, v_hire_date;
+        EXIT WHEN emp_cursor%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE('Employee: ' || v_emp_name || ' (ID: ' || v_emp_id || ') - Hire Date: ' || TO_CHAR(v_hire_date, 'DD-MON-YYYY'));
+    END LOOP;
+    CLOSE emp_cursor;
+END;
+Explanation:
+This PL/SQL block fetches and processes employees who have been with the company for over a year. The cursor filters employees based on the hire date.
+=====================================
+Function to Calculate Age Based on Date of Birth
+plsql
+Copy code
+CREATE OR REPLACE FUNCTION calculate_age(p_dob DATE)
+RETURN NUMBER
+IS
+    v_age NUMBER;
+BEGIN
+    v_age := TRUNC(MONTHS_BETWEEN(SYSDATE, p_dob) / 12);
+    RETURN v_age;
+END;
+Explanation:
+This function takes a date of birth and returns the age in years by calculating the difference between the current date and the date of birth.
+==============================================================
+3. Procedure to Update Salaries Based on Joining Date Anniversary
+plsql
+Copy code
+CREATE OR REPLACE PROCEDURE update_anniversary_bonus IS
+BEGIN
+    FOR emp IN (
+        SELECT employee_id, hire_date
+        FROM employees
+        WHERE TO_CHAR(hire_date, 'MM-DD') = TO_CHAR(SYSDATE, 'MM-DD')  -- Today's hire date anniversary
+    ) LOOP
+        UPDATE employees
+        SET salary = salary * 1.10  -- Giving a 10% bonus
+        WHERE employee_id = emp.employee_id;
+        DBMS_OUTPUT.PUT_LINE('Updated Salary for Employee ID: ' || emp.employee_id);
+    END LOOP;
+END;
+Explanation:
+This procedure updates the salary of employees whose joining anniversary is today, giving them a 10% bonus.
+===================================================
+4. Cursor for Finding Employees with Upcoming Birthdays
+plsql
+Copy code
+DECLARE
+    CURSOR birthday_cursor IS
+        SELECT employee_id, employee_name, date_of_birth
+        FROM employees
+        WHERE TO_CHAR(date_of_birth, 'MM-DD') = TO_CHAR(SYSDATE + 7, 'MM-DD');  -- Birthdays in 7 days
+
+    v_emp_id employees.employee_id%TYPE;
+    v_emp_name employees.employee_name%TYPE;
+    v_dob employees.date_of_birth%TYPE;
+BEGIN
+    OPEN birthday_cursor;
+    LOOP
+        FETCH birthday_cursor INTO v_emp_id, v_emp_name, v_dob;
+        EXIT WHEN birthday_cursor%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE('Upcoming Birthday: ' || v_emp_name || ' (DOB: ' || TO_CHAR(v_dob, 'DD-MON-YYYY') || ')');
+    END LOOP;
+    CLOSE birthday_cursor;
+END;
+Explanation:
+This cursor-based block fetches and processes employees with birthdays coming up in the next week, allowing for proactive communication.
+===================================================================================================
+5. Procedure to Archive Employees Who Left Over a Year Ago
+plsql
+Copy code
+CREATE OR REPLACE PROCEDURE archive_old_employees IS
+BEGIN
+    FOR emp IN (
+        SELECT employee_id, employee_name, termination_date
+        FROM employees
+        WHERE termination_date < ADD_MONTHS(SYSDATE, -12)  -- Left more than a year ago
+    ) LOOP
+        INSERT INTO archived_employees (employee_id, employee_name, termination_date)
+        VALUES (emp.employee_id, emp.employee_name, emp.termination_date);
+
+        DELETE FROM employees WHERE employee_id = emp.employee_id;
+        DBMS_OUTPUT.PUT_LINE('Archived Employee ID: ' || emp.employee_id || ', Name: ' || emp.employee_name);
+    END LOOP;
+END;
+
+
+
+
